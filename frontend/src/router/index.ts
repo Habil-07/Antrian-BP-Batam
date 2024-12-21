@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('@/pages/QueuePage.vue'), // Untuk display monitor
     },
     {
+      path: '/service/:serviceName',
+      name: 'ServiceDetail',
+      component: () => import('@/pages/ServiceDetailPage.vue'),
+    },
+    {
       path: '/appointment',
       component: () => import('@/pages/AppointmentPage.vue'),
     },
@@ -35,6 +40,16 @@ const router = createRouter({
           name: 'AdminAllQueue',
           component: () => import('@/pages/admin/AllQueuePage.vue'),
           meta: { requiresAuth: true },
+        },
+        {
+          path: 'service/:serviceName',
+          name: 'AdminServiceDetail',
+          component: () => import('@/pages/admin/ServiceDetailPage.vue'),
+        },
+        {
+          path: 'queue/:serviceName',
+          name: 'AdminQueueDetail',
+          component: () => import('@/pages/admin/AdminServiceDetailPage.vue'),
         },
       ],
     },

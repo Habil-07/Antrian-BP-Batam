@@ -42,80 +42,97 @@
         />
       </div>
 
-      <!-- Scroll Mode -->
-      <div v-if="viewMode === 'scroll'" class="grid gap-4">
-        <Card v-for="(queues, service) in groupedQueues" :key="service" class="shadow-2">
-          <template #title>
-            <div class="flex align-items-center justify-content-between py-2">
-              <h2 class="text-xl font-semibold m-0">{{ service }}</h2>
-            </div>
-          </template>
-          <template #content>
-            <DataTable :value="queues" stripedRows>
-              <Column field="queue_number" header="No. Antrian"></Column>
-              <Column field="sub_service" header="Layanan"></Column>
-              <Column field="appointment_date" header="Tanggal">
-                <template #body="{ data }">
-                  {{ formatDate(data.appointment_date) }}
-                </template>
-              </Column>
-              <Column field="appointment_time" header="Jam">
-                <template #body="{ data }">
-                  {{ formatTime(data.appointment_time) }}
-                </template>
-              </Column>
-              <Column field="status" header="Status">
-                <template #body="{ data }">
-                  <Tag
-                    :severity="getStatusSeverity(data.status)"
-                    :value="getStatusText(data.status)"
-                  />
-                </template>
-              </Column>
-            </DataTable>
-          </template>
-        </Card>
+      <div v-if="isLoading" class="flex justify-center">
+        <LoadingSpinner />
       </div>
-
-      <!-- Carousel Mode -->
       <div v-else>
-        <Card class="shadow-2">
-          <template #title>
-            <div class="flex items-center justify-between py-2">
-              <Button icon="pi pi-chevron-left" @click="prevService" text />
-              <div class="flex align-items-center">
-                <h2 class="text-xl font-semibold my-auto">
-                  {{ currentService }}
-                </h2>
+        <!-- Scroll Mode -->
+        <div v-if="viewMode === 'scroll'" class="grid gap-4">
+          <Card v-for="(queues, service) in groupedQueues" :key="service" class="shadow-2">
+            <template #title>
+              <div class="flex align-items-center justify-content-between py-2">
+                <RouterLink :to="{ name: 'ServiceDetail', params: { serviceName: service } }">
+                  <h2 class="text-xl font-semibold m-0">{{ service }}</h2>
+                </RouterLink>
               </div>
-              <Button icon="pi pi-chevron-right" @click="nextService" text />
-            </div>
-          </template>
-          <template #content>
-            <DataTable :value="currentQueues" stripedRows>
-              <Column field="queue_number" header="No. Antrian"></Column>
-              <Column field="sub_service" header="Layanan"></Column>
-              <Column field="appointment_date" header="Tanggal">
-                <template #body="{ data }">
-                  {{ formatDate(data.appointment_date) }}
-                </template>
-              </Column>
-              <Column field="appointment_time" header="Jam">
-                <template #body="{ data }">
-                  {{ formatTime(data.appointment_time) }}
-                </template>
-              </Column>
-              <Column field="status" header="Status">
-                <template #body="{ data }">
-                  <Tag
-                    :severity="getStatusSeverity(data.status)"
-                    :value="getStatusText(data.status)"
-                  />
-                </template>
-              </Column>
-            </DataTable>
-          </template>
-        </Card>
+            </template>
+            <template #content>
+              <DataTable :value="queues" stripedRows>
+                <Column field="queue_number" header="No. Antrian"></Column>
+                <Column field="sub_service" header="Layanan"></Column>
+                <Column field="appointment_date" header="Tanggal">
+                  <template #body="{ data }">
+                    {{ formatDate(data.appointment_date) }}
+                  </template>
+                </Column>
+                <Column field="appointment_time" header="Jam">
+                  <template #body="{ data }">
+                    {{ formatTime(data.appointment_time) }}
+                  </template>
+                </Column>
+                <Column field="status" header="Status">
+                  <template #body="{ data }">
+                    <Tag
+                      :severity="getStatusSeverity(data.status)"
+                      :value="getStatusText(data.status)"
+                    />
+                  </template>
+                </Column>
+              </DataTable>
+            </template>
+          </Card>
+        </div>
+
+        <!-- Carousel Mode -->
+        <div v-else>
+          <Card class="shadow-2">
+            <template #title>
+              <div class="flex items-center justify-between py-2">
+                <Button icon="pi pi-chevron-left" @click="prevService" text />
+                <div class="flex align-items-center">
+                  <RouterLink
+                    :to="{ name: 'ServiceDetail', params: { serviceName: currentService } }"
+                  >
+                    <h2 class="text-xl font-semibold m-0">{{ currentService }}</h2>
+                  </RouterLink>
+                </div>
+                <Button icon="pi pi-chevron-right" @click="nextService" text />
+              </div>
+            </template>
+            <template #content>
+              <DataTable :value="currentQueues" stripedRows>
+                <Column field="queue_number" header="No. Antrian"></Column>
+                <Column field="sub_service" header="Layanan">
+                  <template #body="{ data }">
+                    <RouterLink
+                      :to="{ name: 'ServiceDetail', params: { serviceName: data.main_service } }"
+                    >
+                      {{ data.sub_service }}
+                    </RouterLink>
+                  </template>
+                </Column>
+                <Column field="appointment_date" header="Tanggal">
+                  <template #body="{ data }">
+                    {{ formatDate(data.appointment_date) }}
+                  </template>
+                </Column>
+                <Column field="appointment_time" header="Jam">
+                  <template #body="{ data }">
+                    {{ formatTime(data.appointment_time) }}
+                  </template>
+                </Column>
+                <Column field="status" header="Status">
+                  <template #body="{ data }">
+                    <Tag
+                      :severity="getStatusSeverity(data.status)"
+                      :value="getStatusText(data.status)"
+                    />
+                  </template>
+                </Column>
+              </DataTable>
+            </template>
+          </Card>
+        </div>
       </div>
     </div>
   </div>
@@ -127,13 +144,26 @@ import { appointmentService } from '@/services/appointment'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
+import { RouterLink } from 'vue-router'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
-const appointments = ref([])
+interface AppointmentResponse {
+  status: string
+  data: Record<string, any[]>
+  message?: string
+}
+
+interface ApiResponse extends AppointmentResponse {
+  message?: string
+}
+
+const appointments = ref<AppointmentResponse>()
 const isLoading = ref(true)
 const error = ref('')
 const viewMode = ref('scroll')
 const currentServiceIndex = ref(0)
 const dataMode = ref('today')
+const first = ref(0)
 
 // Group appointments by main service
 const groupedQueues = computed(() => {
@@ -166,8 +196,7 @@ const getStatusText = (status: string) => {
 const fetchAppointments = async () => {
   try {
     isLoading.value = true
-    // await appointmentService.getAllQueue()
-    const response =
+    const response: ApiResponse =
       dataMode.value === 'today'
         ? await appointmentService.getTodayQueue()
         : await appointmentService.getAllQueue()
@@ -256,4 +285,7 @@ const formatDate = (date: string) => {
 const formatTime = (time: string) => {
   return time.substring(0, 5) // Ambil hanya jam:menit
 }
+
+// Tambahkan state untuk pagination
+const totalRecords = computed(() => currentQueues.value?.length || 0)
 </script>

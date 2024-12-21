@@ -9,7 +9,7 @@
           <div class="flex items-center justify-between mb-6">
             <div>
               <h2 class="text-3xl font-bold text-gray-900">Buat Janji Temu</h2>
-              <p class="mt-1 text-sm text-gray-600">
+              <p class="mt-2 text-sm text-gray-600">
                 Silahkan isi form di bawah ini untuk membuat janji temu
               </p>
             </div>
@@ -18,6 +18,12 @@
 
         <template #content>
           <form @submit.prevent="handleSubmit" class="space-y-6">
+            <p class="mt-1 text-md text-neutral-600 italic">
+              Layanan dan sub layanan dapat dilihat di halaman
+              <a href="https://bpbatam.go.id/pelayanan/" class="text-blue-500" target="_blank"
+                >Pelayanan</a
+              >
+            </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Layanan -->
               <div>
@@ -57,8 +63,8 @@
                   class="w-full"
                   :manualInput="false"
                   :showButtonBar="true"
-                  :firstDayOfWeek="1"
-                  :locale="id"
+                  :locale="calendarLocale"
+                  :disabledDays="[0, 6]"
                 />
               </div>
 
@@ -186,6 +192,7 @@ const availableTimes = [
 
 // Konfigurasi Calendar
 const calendarSettings = {
+  disableDate: [0, 6],
   firstDayOfWeek: 1,
   dayNames: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
   dayNamesShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
@@ -223,6 +230,18 @@ const calendarSettings = {
   dateFormat: 'dd/mm/yy',
   weekHeader: 'Mg',
 }
+const calendarLocale = computed(() => ({
+  firstDayOfWeek: calendarSettings.firstDayOfWeek,
+  dayNames: calendarSettings.dayNames,
+  dayNamesShort: calendarSettings.dayNamesShort,
+  dayNamesMin: calendarSettings.dayNamesMin,
+  monthNames: calendarSettings.monthNames,
+  monthNamesShort: calendarSettings.monthNamesShort,
+  today: calendarSettings.today,
+  clear: calendarSettings.clear,
+  dateFormat: calendarSettings.dateFormat,
+  weekHeader: calendarSettings.weekHeader,
+}))
 
 const handleServiceChange = () => {
   formData.value.subService = ''
@@ -233,7 +252,7 @@ const handleServiceChange = () => {
 
 const handleSubServiceChange = () => {
   if (formData.value.subService) {
-    formData.value.queuePrefix = getQueuePrefix(formData.value.subService)
+    formData.value.queuePrefix = getQueuePrefix(formData.value.mainService)
   }
 }
 
@@ -243,16 +262,16 @@ const toast = useToast()
 const appointmentDetail = ref<any>(null)
 const showDetailModal = ref(false)
 
+const locale = 'id-ID'
+
 const handleSubmit = async () => {
   try {
     isLoading.value = true
 
-    // Validasi form tetap sama...
-
     const response = await appointmentService.create({
       main_service: formData.value.mainService,
       sub_service: formData.value.subService,
-      appointment_date: formData.value.date,
+      appointment_date: formData.value.date ?? '',
       appointment_time: formData.value.time,
       customer_name: formData.value.name,
       customer_nik: formData.value.nik,

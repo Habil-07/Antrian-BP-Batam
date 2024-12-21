@@ -3,7 +3,11 @@ export default {
   darkMode: 'false',
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        128: '32rem',
+      },
+    },
   },
   plugins: [],
 }

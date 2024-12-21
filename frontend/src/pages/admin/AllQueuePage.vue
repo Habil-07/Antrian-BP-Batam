@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 py-8">
     <Toast />
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center my-6">
         <div class="text-center">
           <h1 class="text-3xl font-bold text-gray-900 mb-2">Panel Admin - Semua Antrian</h1>
           <p class="text-gray-600">Kelola semua antrian berdasarkan tanggal</p>
@@ -17,60 +17,66 @@
           <Button label="Logout" icon="pi pi-sign-out" severity="danger" @click="handleLogout" />
         </div>
       </div>
-
-      <div class="grid gap-4">
-        <Card v-for="(queues, service) in appointments?.data" :key="service" class="shadow-2">
-          <template #title>
-            <div class="flex items-center justify-between">
-              <h2 class="text-xl font-semibold m-0">{{ service }}</h2>
-            </div>
-          </template>
-          <template #content>
-            <DataTable :value="queues" stripedRows>
-              <Column field="queue_number" header="No. Antrian"></Column>
-              <Column field="sub_service" header="Layanan"></Column>
-              <Column field="customer_name" header="Nama"></Column>
-              <Column field="appointment_date" header="Tanggal">
-                <template #body="{ data }">
-                  {{ formatDate(data.appointment_date) }}
-                </template>
-              </Column>
-              <Column field="appointment_time" header="Jam">
-                <template #body="{ data }">
-                  {{ formatTime(data.appointment_time) }}
-                </template>
-              </Column>
-              <Column field="status" header="Status">
-                <template #body="{ data }">
-                  <Tag
-                    :severity="getStatusSeverity(data.status)"
-                    :value="getStatusText(data.status)"
-                  />
-                </template>
-              </Column>
-              <Column header="Aksi">
-                <template #body="{ data }">
-                  <div class="flex gap-2">
-                    <Button
-                      icon="pi pi-check"
-                      severity="success"
-                      :disabled="data.status === 'completed' || data.status === 'cancelled'"
-                      @click="completeQueue(data)"
-                      tooltip="Selesai"
+      <div v-if="isLoading" class="flex justify-center">
+        <LoadingSpinner />
+      </div>
+      <div v-else>
+        <div class="grid gap-4">
+          <Card v-for="(queues, service) in appointments?.data" :key="service" class="shadow-2">
+            <template #title>
+              <div class="flex items-center justify-between">
+                <RouterLink :to="{ name: 'AdminServiceDetail', params: { serviceName: service } }">
+                  <h2 class="text-xl font-semibold m-0">{{ service }}</h2>
+                </RouterLink>
+              </div>
+            </template>
+            <template #content>
+              <DataTable :value="queues" stripedRows>
+                <Column field="queue_number" header="No. Antrian"></Column>
+                <Column field="sub_service" header="Layanan"></Column>
+                <Column field="customer_name" header="Nama"></Column>
+                <Column field="appointment_date" header="Tanggal">
+                  <template #body="{ data }">
+                    {{ formatDate(data.appointment_date) }}
+                  </template>
+                </Column>
+                <Column field="appointment_time" header="Jam">
+                  <template #body="{ data }">
+                    {{ formatTime(data.appointment_time) }}
+                  </template>
+                </Column>
+                <Column field="status" header="Status">
+                  <template #body="{ data }">
+                    <Tag
+                      :severity="getStatusSeverity(data.status)"
+                      :value="getStatusText(data.status)"
                     />
-                    <Button
-                      icon="pi pi-times"
-                      severity="danger"
-                      :disabled="data.status === 'completed' || data.status === 'cancelled'"
-                      @click="cancelQueue(data)"
-                      tooltip="Batalkan"
-                    />
-                  </div>
-                </template>
-              </Column>
-            </DataTable>
-          </template>
-        </Card>
+                  </template>
+                </Column>
+                <Column header="Aksi">
+                  <template #body="{ data }">
+                    <div class="flex gap-2">
+                      <Button
+                        icon="pi pi-check"
+                        severity="success"
+                        :disabled="data.status === 'completed' || data.status === 'cancelled'"
+                        @click="completeQueue(data)"
+                        tooltip="Selesai"
+                      />
+                      <Button
+                        icon="pi pi-times"
+                        severity="danger"
+                        :disabled="data.status === 'completed' || data.status === 'cancelled'"
+                        @click="cancelQueue(data)"
+                        tooltip="Batalkan"
+                      />
+                    </div>
+                  </template>
+                </Column>
+              </DataTable>
+            </template>
+          </Card>
+        </div>
       </div>
     </div>
   </div>
@@ -86,11 +92,12 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { appointmentService } from '@/services/appointment'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const toast = useToast()
 const router = useRouter()
 const appointments = ref()
-const isLoading = ref(false)
+const isLoading = ref(true)
 let refreshInterval: number | null = null
 
 // Reuse fungsi yang sama dari QueuePage

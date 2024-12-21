@@ -77,6 +77,10 @@ class AppointmentController extends Controller
                 'whatsapp' => 'nullable|string|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
                 'queue_prefix' => 'required|string'
             ], [
+                'sub_service.required' => 'Sub layanan harus diisi.',
+                'sub_service.string' => 'Sub layanan harus berupa teks.',
+                'appointment_date.required' => 'Tanggal janji temu harus diisi.',
+                'appointment_time.required' => 'Waktu janji temu harus diisi.',
                 'appointment_date.after_or_equal' => 'Tanggal harus hari ini atau setelahnya',
                 'appointment_time.regex' => 'Format waktu tidak valid',
                 'customer_nik.size' => 'NIK harus 16 digit',
@@ -138,7 +142,7 @@ class AppointmentController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi gagal, silakan periksa kembali data yang dimasukkan',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {

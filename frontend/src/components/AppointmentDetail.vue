@@ -57,20 +57,18 @@
         </div>
       </div>
 
-      <div class="flex justify-center gap-2 mt-6">
+      <div class="flex justify-center items-center gap-2 mt-6">
         <Button
           label="Simpan PDF"
           icon="pi pi-file-pdf"
           @click="generatePDF"
           severity="secondary"
         />
-        <Button
-          v-if="data?.whatsapp"
-          label="Kirim ke WhatsApp"
-          icon="pi pi-whatsapp"
-          @click="sendToWhatsApp"
-          severity="success"
-        />
+      </div>
+      <div class="mt-4 flex justify-center">
+        <p class="text-sm text-gray-600 italic">
+          Silakan tunjukkan pesan ini saat kedatangan Anda.
+        </p>
       </div>
     </div>
   </Dialog>
@@ -111,23 +109,5 @@ const generatePDF = () => {
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
   }
   html2pdf().set(opt).from(element).save()
-}
-
-const sendToWhatsApp = () => {
-  const message = `
-*Janji Temu BP Batam*
-No. Antrian: ${props.data?.queue_number}
-Layanan: ${props.data?.main_service}
-Sub Layanan: ${props.data?.sub_service}
-Tanggal: ${formatDate(props.data?.appointment_date)}
-Jam: ${props.data?.appointment_time}
-
-Nama: ${props.data?.customer_name}
-NIK: ${props.data?.customer_nik}
-
-Silakan tunjukkan pesan ini saat kedatangan Anda.
-`
-  const whatsappUrl = `https://wa.me/${props.data?.whatsapp}?text=${encodeURIComponent(message)}`
-  window.open(whatsappUrl, '_blank')
 }
 </script>

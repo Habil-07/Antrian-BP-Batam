@@ -1,7 +1,13 @@
 <template>
-  <nav class="bg-white shadow-lg">
+  <nav
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    :class="{
+      'bg-white/80 backdrop-blur-md shadow-lg': isScrolled,
+      'bg-white shadow-lg': !isScrolled,
+    }"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
+      <div class="flex justify-between h-20">
         <!-- Logo dan Brand -->
         <div class="flex items-center">
           <router-link to="/" class="flex items-center">
@@ -32,12 +38,12 @@
         </div>
 
         <!-- Menu Navigasi Desktop -->
-        <div class="hidden md:flex items-center space-x-4">
+        <div class="hidden md:flex items-center space-x-4 py-4">
           <router-link
             v-for="(item, index) in menuItems"
             :key="index"
             :to="item.path"
-            class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+            class="text-gray-700 hover:text-blue-600 px-5 py-3 rounded-md text-md font-medium"
             :class="{ 'text-blue-600': $route.path === item.path }"
           >
             {{ item.name }}
@@ -62,15 +68,20 @@
       </div>
     </div>
   </nav>
+
+  <!-- Spacer untuk kompensasi navbar fixed -->
+  <div class="h-16"></div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Button from 'primevue/button'
 
 const router = useRouter()
 const route = useRoute()
 const isOpen = ref(false)
+const isScrolled = ref(false)
 
 const menuItems = [
   { name: 'Beranda', path: '/' },
@@ -78,4 +89,25 @@ const menuItems = [
   { name: 'Antrian', path: '/queue' },
   { name: 'Admin', path: '/admin/queue' },
 ]
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 0
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('isAdmin') // Hapus status login
+  router.push('/admin/login') // Arahkan ke halaman login
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
+
+<style scoped>
+/* Tambahkan gaya sesuai kebutuhan */
+</style>

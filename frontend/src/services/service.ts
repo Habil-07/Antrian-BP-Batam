@@ -137,6 +137,7 @@ function getQueuePrefix(service: string): string {
     .map((word) => word[0])
     .join('')
     .toUpperCase()
+    .replace(/[()]/g, '') // Remove any parentheses
 }
 
 export { services, getQueuePrefix }
