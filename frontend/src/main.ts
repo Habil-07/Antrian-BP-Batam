@@ -6,9 +6,7 @@ import PrimeVue from 'primevue/config'
 
 // Import PrimeVue themes from @primevue/themes
 import lara from '@primevue/themes/lara'
-import nora from '@primevue/themes/nora'
-import aura from '@primevue/themes/aura'
-import material from '@primevue/themes/material'
+
 // Import core PrimeVue styles and icons
 import 'primeicons/primeicons.css'
 import './assets/tailwind.css'
