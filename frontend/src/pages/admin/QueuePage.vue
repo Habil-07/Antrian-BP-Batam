@@ -174,7 +174,7 @@ const handleLogout = () => {
 
 onMounted(() => {
   fetchAppointments()
-  refreshInterval = setInterval(fetchAppointments, 30000)
+  refreshInterval = setInterval(fetchAppointments, 60000)
 })
 
 onUnmounted(() => {

@@ -216,7 +216,7 @@ const fetchAppointments = async () => {
 onMounted(() => {
   fetchAppointments()
   // Refresh data every 30 seconds
-  setInterval(fetchAppointments, 30000)
+  setInterval(fetchAppointments, 60000)
 })
 
 // Watch perubahan dataMode untuk refresh data
@@ -258,7 +258,7 @@ let carouselInterval: number | null = null
 
 watch(viewMode, (newMode) => {
   if (newMode === 'carousel') {
-    carouselInterval = setInterval(nextService, 10000)
+    carouselInterval = setInterval(nextService, 60000)
   } else {
     if (carouselInterval) {
       clearInterval(carouselInterval)
