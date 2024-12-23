@@ -199,5 +199,5 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import bgImage from '@/assets/bg-batam.jpg'
-const router = useRouter()
+
 </script>
